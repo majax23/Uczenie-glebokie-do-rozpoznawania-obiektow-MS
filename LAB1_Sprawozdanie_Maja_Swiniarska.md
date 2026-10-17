@@ -16,7 +16,7 @@ Celem ćwiczenia było zbudowanie pierwszego klasyfikatora obrazów przy użyciu
 
 - **Zbiór danych:** Wykorzystano zbiór FashionMNIST* (obrazy ubrań w skali szarości, rozdzielczość 28x28 pikseli). Został on wybrany zamiast CIFAR-10 ze względu na ograniczenia sieci gęstych (MLP). Sieci tego typu wymagają spłaszczenia obrazu do wektora jednowymiarowego. Dla FashionMNIST wektor wejściowy ma rozmiar 784, natomiast dla CIFAR-10 wynosiłby 3072, co przy sieciach typu Fully Connected drastycznie zawyżyłoby liczbę parametrów i prowokowało silne zjawisko przeuczenia.
 - **Narzędzia:** PyTorch (konstrukcja i uczenie modelu), torchvision (ładowanie danych, transformacje), matplotlib (wizualizacja krzywych i siatki predykcji), scikit-learn (macierz pomyłek). Trening z użyciem akceleracji GPU (CUDA).
-- **Kod:** LINK WKLEIC DO GITA
+- **Kod:** [Notatnik z kodem](https://github.com/majax23/Uczenie-glebokie-do-rozpoznawania-obiektow-MS/blob/main/LAB1_Zadanie_Maja_Swiniarska.ipynb)
 - **Konfiguracja eksperymentu:** 
   - Optymalizator: Adam.
   - Funkcja straty: CrossEntropyLoss.
