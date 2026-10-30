@@ -1,0 +1,87 @@
+**Przedmiot:** Uczenie głębokie do rozpoznawania obiektów
+
+**Zajęcia nr / temat:** 3. Dane obrazowe i wideo — potok danych pod lupą
+
+**Autor / grupa:** Maja Świniarska GL.04
+
+**Data:** 28.10.2026
+
+## 1. Cel ćwiczenia
+
+Zbudowanie własnego zbioru w układzie ImageFolder i sprawdzonego potoku danych (pliki → paczki tensorów): dwa potoki transformacji, podział train/val, statystyki, audyt paczki, podgląd augmentacji.
+
+
+## 2. Metoda i implementacja
+Dane: zbiór Apple-vs-Tomato (zdjęcia i grafiki jabłek oraz pomidorów, użyto 2 × 50 obrazów). 
+
+Źródło: Samuel Cortinhas, Apples or tomatoes - image classification, Kaggle, https://www.kaggle.com/datasets/samuelcortinhas/apples-or-tomatoes-image-classification (dostęp: 30.10.2026). 
+
+Licencja: CC0: Public Domain
+
+Narzędzia: Colab, PyTorch, torchvision, Pillow, NumPy, pandas, matplotlib.
+
+[Notatnik z kodem]()
+
+| Element | Ustawienie |
+|---|---|
+| Rozmiar / normalizacja | `Resize((64, 64))`, `Normalize([0.5]*3, [0.5]*3)` → zakres [−1, 1] |
+| `eval_tf` | Resize → ToTensor → Normalize |
+| `train_tf` | Resize → RandomHorizontalFlip → RandomRotation(15) → ColorJitter(brightness=0.2, contrast=0.2) → ToTensor → Normalize |
+| Podział | 80/20, warstwowy, `seed=42`; dwa `ImageFolder` + `Subset` |
+| DataLoader train | `batch_size=16`, `shuffle=True`, `num_workers=0`, `train_tf` |
+| DataLoader val | `batch_size=32`, `shuffle=False`, `num_workers=0`, `eval_tf` |
+
+Wyciek danych: kontrola duplikatów (miniatura 16×16) wykryła jedną parę niemal identycznych jabłek (img_p1_29, img_p1_68). Kod zawsze umieszcza takie kopie w tej samej części podziału; rozłączność indeksów sprawdza asercja.
+
+Uzasadnienie augmentacji (nie zmieniają klasy):
+
+HorizontalFlip — jabłko i pomidor są praktycznie symetryczne, na zdjęciach nie ma tekstu.
+
+Rotation ±15° — owoc po małym obrocie pozostaje rozpoznawalny; imituje inne ułożenie owocu.
+
+ColorJitter (jasność, kontrast ±20%) — symuluje oświetlenie, nie zmienia barwy; odcienia celowo nie zmieniano, bo kolor bywa istotny (zielone owoce).
+
+## 3. Wyniki
+
+### Statystyki zbioru 
+
+| Klasa | Indeks (`class_to_idx`) | Train | Val | Razem |
+|---|---|---|---|---|
+| Apples | 0 | 40 | 10 | 50 |
+| Tomatoes | 1 | 40 | 10 | 50 |
+| **Razem** | | **80** | **20** | **100** |
+
+### Audyt jednej paczki
+
+| | Train (augmentacja, shuffle) | Val (bez augmentacji) |
+|---|---|---|
+| Kształt | `[16, 3, 64, 64]` | `[20, 3, 64, 64]` |
+| Typ | `float32` | `float32` |
+| Zakres | min −1,000; max 1,000 | min −1,000; max 1,000 |
+| Etykiety | `[0,0,1,0,1,1,1,1,0,1,1,1,0,0,0,0]` (8 × 0 i 8 × 1) | `[1,1,1,0,1,0,0,0,1,0,1,1,0,0,0,0,1,0,1,1]` (10 × 0 i 10 × 1) |
+
+
+<img width="1712" height="476" alt="siatka_train" src="https://github.com/user-attachments/assets/26baeb6c-ef1a-4378-8bc1-7a24ab41480d" />
+<img width="1715" height="711" alt="siatka_val" src="https://github.com/user-attachments/assets/32389b38-f05b-4c02-846f-dc82da6547b9" />
+<img width="1667" height="615" alt="augmentacje" src="https://github.com/user-attachments/assets/0d329673-190f-46b8-b146-730d937b5024" />
+
+
+
+
+## 4. Analiza i interpretacja
+
+- Kształt, typ i zakres tensorów zgadzają się z kontraktem danych; wartości ujemne po normalizacji są poprawne.
+  
+- Zbiór jest zbalansowany (50 : 50) i podzielony bez znanego wycieku.
+  
+- Ograniczenia: tylko 20 obrazów walidacyjnych (1 obraz = 5 p.p.); zbiór jest różnorodny (fotografie, rysunki, opakowania, wzory), więc model może uczyć się cech tła/stylu; Resize((64, 64)) lekko zniekształca obrazy niekwadratowe (np. 275×183); rozdzielczość 64×64 ogranicza drobne szczegóły.
+
+- RODO: w kadrze nie ma osób, więc nie przetwarzamy danych osobowych.
+
+## 5. Wnioski
+
+Potok ImageFolder → Subset → DataLoader działa poprawnie: augmentacja tylko w treningu, podział warstwowy i bez wycieku, audyt paczki potwierdza format danych. Możliwe poprawki: więcej obrazów (zwłaszcza walidacyjnych), ujednolicenie typów obrazów, wyższa rozdzielczość, Resize + CenterCrop zamiast wymuszania kwadratu, test dymny prostym modelem.
+
+
+---
+
