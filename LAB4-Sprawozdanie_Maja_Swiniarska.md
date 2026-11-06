@@ -1,9 +1,11 @@
 # Sprawozdanie laboratoryjne
 
 **Przedmiot:** Uczenie głębokie do rozpoznawania obiektów
-**Zajęcia nr / temat:** Laboratorium 04 — Splotowe sieci neuronowe (CNN) - porównanie z MLP na zbiorze CIFAR-10
-**Autor / grupa:** [uzupełnij]
-**Data:** [uzupełnij]
+
+**Zajęcia nr / temat:** 04. Splotowe sieci neuronowe (CNN) 
+
+**Autor / grupa:** Maja Świniarska GL.04
+**Data:** 04.11.2026
 
 ## 1. Cel ćwiczenia
 
@@ -23,16 +25,14 @@ Celem ćwiczenia jest wytrenowanie sieci MLP (Multi-Layer Perceptron) oraz prost
     *   Learning rate (lr): 0.001
     *   Batch size: 128
     *   Optymalizator: Adam
-    *   Augmentacja danych: Zastosowano `RandomCrop` i `RandomHorizontalFlip` (tylko zbiór treningowy, wartość parametru: `False` - *Uwaga: W konfiguracji wygenerowanej przez notebook augmentacja była wyłączona (`augment: False`)*).
+    *   Augmentacja danych: Zastosowano `RandomCrop` i `RandomHorizontalFlip` 
     *   Seed: 42
 
-**Najważniejsze fragmenty kodu:**
-
-*(Poniżej możesz wkleić link do notatnika, w tym przypadku użyto gotowego pliku ipynb udostępnionego przez prowadzącego)*
+* **[Notatnik z kodem](https://github.com/majax23/Uczenie-glebokie-do-rozpoznawania-obiektow-MS/blob/main/LAB4_Zadanie_Maja_Swiniarska.ipynb)**
 
 ## 3. Wyniki
 
-**Tabela główna: Porównanie modeli (Zakres obowiązkowy)**
+**Tabela główna: Porównanie modeli**
 
 *(Poniżej należy wkleić tabelę Markdown, która zostanie wygenerowana w konsoli (pod tytułem "### Gotowa tabela Markdown do sprawozdania:") po uruchomieniu dostarczonego notatnika)*
 
