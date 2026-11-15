@@ -1,9 +1,12 @@
 # Sprawozdanie laboratoryjne
 
 **Przedmiot:** Uczenie głębokie do rozpoznawania obiektów
+
 **Zajęcia nr / temat:** 5 — Warstwy splotowe: operacja, parametry, interpretacja
-**Autor / grupa:** …
-**Data:** …
+
+**Autor / grupa:** Maja Świniarska GL.04
+
+**Data:** 13.11.2026
 
 ## 1. Cel ćwiczenia
 
@@ -11,7 +14,8 @@ Zbadanie działania warstwy splotowej na własnym zdjęciu w skali szarości (51
 
 **Zdjęcie przed filtracją** (to samo we wszystkich punktach):
 
-![Zdjęcie przed filtracją](wyniki/00_zdjecie_oryginalne.png)
+<img width="549" height="756" alt="00_zdjecie_oryginalne" src="https://github.com/user-attachments/assets/e486d3dd-4a68-42eb-bab1-8c83ddbb7756" />
+
 
 ## 2. Metoda i implementacja
 
@@ -20,24 +24,14 @@ Zbadanie działania warstwy splotowej na własnym zdjęciu w skali szarości (51
 - Splot: `F.conv2d`, `padding = k//2` (zachowanie rozmiaru dla `s=1, d=1`).
 - Wzór na wymiar osi: `out = (in + 2p − d(k−1) − 1)//s + 1`.
 - Sieć: wejście 3-kanałowe = ta sama skala szarości w każdym kanale (`pil_gray.convert("RGB")`), preprocessing `weights.transforms()` (resize 256, crop 224, normalizacja ImageNet); mapy z `conv1` po ReLU.
-- Notatnik: `LAB5OBIEKTY.ipynb` — [link do repozytorium]
-
-Kluczowe fragmenty:
-
-```python
-sobel_x = kernel([[-1,0,1],[-2,0,2],[-1,0,1]]);  sobel_y = sobel_x.transpose(-2, -1)
-edges = (F.conv2d(gray, sobel_x, padding=1)**2 + F.conv2d(gray, sobel_y, padding=1)**2).sqrt()
-
-v = torch.tensor([1., 4., 6., 4., 1.])
-gauss5 = (v[:,None] * v[None,:] / 256).view(1,1,5,5)           # Box: torch.ones(1,1,k,k)/k**2
-out = F.conv2d(gray, kern, stride=1, padding=kern.shape[-1]//2, dilation=1)
-```
+- [Notatnik z kodem](https://github.com/majax23/Uczenie-glebokie-do-rozpoznawania-obiektow-MS/blob/main/LAB5_Zadanie_Maja_Swiniarska.ipynb)
 
 ## 3. Wyniki
 
-### 3.1 Ręczne jądra (pkt 1)
+### 3.1 Ręczne jądra
 
-![Ręczne jądra](wyniki/01_reczne_jadra.png)
+<img width="1935" height="1766" alt="01_reczne_jadra" src="https://github.com/user-attachments/assets/7b4413a8-3ab5-476c-b5d6-057785f2c32b" />
+
 
 Sobel X/Y pokazane ze znakiem (paleta RdBu, wspólna skala ±3,89), pozostałe na skali 0–1.
 
@@ -51,7 +45,7 @@ Sobel X/Y pokazane ze znakiem (paleta RdBu, wspólna skala ±3,89), pozostałe n
 
 Na tym zdjęciu poziome krawędzie są silniejsze niż pionowe (śr. \|gy\| / \|gx\| = 1,63).
 
-### 3.2 Wzór na wymiary wyjścia (pkt 2)
+### 3.2 Wzór na wymiary wyjścia 
 
 Wejście 32×32×3, 8 filtrów (`nn.Conv2d(3, 8, ...)`).
 
@@ -67,11 +61,12 @@ Wejście 32×32×3, 8 filtrów (`nn.Conv2d(3, 8, ...)`).
 
 7 z 7 konfiguracji zgodnych. Rozmiar zachowany dla `s=1` i `2p = d(k−1)` (wiersze 1, 3, 4).
 
-### 3.3 Wpływ stride, padding i dilation (pkt 3)
+### 3.3 Wpływ stride, padding i dilation 
 
 Sobel X, wartość bezwzględna, wspólna skala jasności; wejście 512×384; czerwona ramka = rozmiar wejścia.
 
-![stride, padding, dilation](wyniki/02_stride_padding_dilation.png)
+<img width="2106" height="1784" alt="02_stride_padding_dilation" src="https://github.com/user-attachments/assets/47d56d92-b49f-421b-944b-d8cb02b7b836" />
+
 
 | Parametr | Ustawienie | Wyjście | Uwagi |
 |---|---|---|---|
@@ -84,15 +79,17 @@ Sobel X, wartość bezwzględna, wspólna skala jasności; wejście 512×384; cz
 
 Dla każdego ustawienia rozmiar z `F.conv2d` = rozmiar ze wzoru (wartości w tytułach paneli).
 
-### 3.4 Mapy cech pretrenowanej sieci (pkt 4)
+### 3.4 Mapy cech pretrenowanej sieci 
 
 Warstwa: `conv1` ResNet-18 (64 filtry 7×7×3 = 147 wag każdy, k=7, s=2, p=3) → 64 mapy 112×112 po ReLU.
 
-![Filtry conv1](wyniki/03a_filtry_conv1.png)
+<img width="1771" height="889" alt="03a_filtry_conv1" src="https://github.com/user-attachments/assets/ed725f83-a7f6-4bab-9174-dfff816710c3" />
 
-![Mapy cech conv1 (16 pierwszych)](wyniki/03b_mapy_conv1.png)
 
-![Efektywne filtry i mapy — 8 o największej średniej odpowiedzi](wyniki/03c_filtry_i_mapy_top8.png)
+<img width="2085" height="686" alt="03b_mapy_conv1" src="https://github.com/user-attachments/assets/ac0664d8-b838-45a4-aa1e-8e719b29b5ab" />
+
+<img width="2535" height="772" alt="03c_filtry_i_mapy_top8" src="https://github.com/user-attachments/assets/be139873-3a64-437e-87ac-de88b50b0f2f" />
+
 
 Na rysunku 3c filtr RGB sprowadzono do jednego filtra szarości (suma W_c/σ_c), bo kanały wejścia niosą ten sam sygnał.
 
@@ -106,17 +103,21 @@ Na rysunku 3c filtr RGB sprowadzono do jednego filtra szarości (suma W_c/σ_c),
 
 Z 16 pierwszych map (rys. 3b): mapy 0 i 8 — drobne prążki bruku (wysokie częstotliwości, odpowiednio poziome i pionowe); mapy 2, 4, 6, 9 — wygładzona jasność; mapy 3, 7, 13 — ciemne obszary (opony, wnęki kół, cień pod autem) świecą na ciemnym tle karoserii; mapy 1, 5, 10, 11, 14 — krawędzie (obrys auta, okna). ReLU zeruje odpowiedzi ujemne, stąd ciemne tło wielu map. Mapy obejmują środkowy kwadrat 224×224 (center crop), dlatego auto jest przycięte po bokach.
 
-### 3.5 Porównanie filtrów rozmywających (pkt 5)
+### 3.5 Porównanie filtrów rozmywających 
 
 Filtry: Box 3×3 (wagi 1/9, `padding=1`), Box 5×5 (wagi 1/25, `padding=2`), Gaussian 5×5 (`[1,4,6,4,1]⊗[1,4,6,4,1]/256`, `padding=2`); `stride=1`, `dilation=1`; wyjście 512×384 dla każdego, suma wag = 1. Fragment: wiersze 250–345, kolumny 270–365 (grill, reflektor, tablica rejestracyjna), wspólna skala jasności 0–1.
 
-![Wybrany fragment](wyniki/04a_fragment.png)
+<img width="549" height="754" alt="04a_fragment" src="https://github.com/user-attachments/assets/16a78b01-6b25-454b-a819-ca8bd930d0a1" />
 
-![Fragment przed i po filtracji](wyniki/04b_fragment_przed_po.png)
 
-![Profil jasności, wiersz 312](wyniki/04c_profil_jasnosci.png)
+<img width="2685" height="708" alt="04b_fragment_przed_po" src="https://github.com/user-attachments/assets/4524946e-c74d-4344-9b8a-737e89157781" />
 
-![Wagi jąder](wyniki/04d_wagi_jader.png)
+
+<img width="1270" height="587" alt="04c_profil_jasnosci" src="https://github.com/user-attachments/assets/59effa1c-4da9-4671-ad62-6f4b2f27a303" />
+
+
+<img width="2002" height="683" alt="04d_wagi_jader" src="https://github.com/user-attachments/assets/5d36327f-2e0d-41e9-abe1-6108f9074d94" />
+
 
 **Siła krawędzi we fragmencie** (magnituda Sobela):
 
@@ -141,9 +142,11 @@ Szerokość przejścia jasność 0,5 → 0,15 na krawędzi tablica–opona (wier
 
 **Filtry płytkiej i głębokiej warstwy.**
 
-![Mapy conv1 / layer1.0.conv1 / layer3.0.conv1](wyniki/05a_mapy_plytka_vs_gleboka.png)
+<img width="2535" height="1297" alt="05a_mapy_plytka_vs_gleboka" src="https://github.com/user-attachments/assets/a9461100-b3a8-46b2-8b2a-1f0d53b00983" />
 
-![Filtr 0 z layer1.0.conv1](wyniki/05b_filtr_gleboki.png)
+
+<img width="1935" height="559" alt="05b_filtr_gleboki" src="https://github.com/user-attachments/assets/8f2e1787-8b40-4f05-98dd-03ee338a9b96" />
+
 
 | Warstwa | Kształt wag | Wag na filtr | Mapy |
 |---|---|---|---|
@@ -153,7 +156,8 @@ Szerokość przejścia jasność 0,5 → 0,15 na krawędzi tablica–opona (wier
 
 **Własne jądro — krawędzie ukośne.** `diag_a = [[0,1,2],[-1,0,1],[-2,-1,0]]` (krawędzie `\`), `diag_b` = odbicie kolumn (krawędzie `/`).
 
-![Jądra ukośne](wyniki/06_wlasne_jadro_ukosne.png)
+<img width="1935" height="1685" alt="06_wlasne_jadro_ukosne" src="https://github.com/user-attachments/assets/943449d3-cff1-48e3-af97-2449bac0bc52" />
+
 
 Na rombie testowym `diag_a` daje odpowiedź tylko na dwóch bokach biegnących po przekątnej `\` (północno-wschodni ujemny, południowo-zachodni dodatni), a `diag_b` tylko na dwóch pozostałych (`/`); na bokach o przeciwnej orientacji odpowiedź jest zerowa.
 
@@ -161,9 +165,9 @@ Na rombie testowym `diag_a` daje odpowiedź tylko na dwóch bokach biegnących p
 
 | Przypadek | Wejście → wyjście | `Conv2d` | Gęsta | Stosunek |
 |---|---|---|---|---|
-| `conv1` ResNet-18, k=7, bez biasu | 3×224×224 → 64×112×112 | 9 408 | 120 846 286 848 | 12 845 056× |
-| Zdjęcie, 1→8 filtrów, k=3 | 1×512×384 → 8×512×384 | 80 | 309 239 218 176 | 3 865 490 227× |
-| 32×32 RGB, 16 filtrów, k=3 | 3×32×32 → 16×32×32 | 448 | 50 348 032 | 112 384× |
+| `conv1` ResNet-18, k=7, bez biasu | 3×224×224 -> 64×112×112 | 9 408 | 120 846 286 848 | 12 845 056× |
+| Zdjęcie, 1→8 filtrów, k=3 | 1×512×384 -> 8×512×384 | 80 | 309 239 218 176 | 3 865 490 227× |
+| 32×32 RGB, 16 filtrów, k=3 | 3×32×32 -> 16×32×32 | 448 | 50 348 032 | 112 384× |
 
 Wzory: `Conv2d` = C_out·C_in·k² (+ C_out biasów); gęsta = (C_in·H·W)·(C_out·H_out·W_out) (+ biasy). Wartości `Conv2d` zgodne z liczbą parametrów z PyTorch (9 408 / 80 / 448).
 
@@ -173,7 +177,7 @@ Wzory: `Conv2d` = C_out·C_in·k² (+ C_out biasów); gęsta = (C_in·H·W)·(C_
 
 **Wymiary.** Wzór zgadza się z `nn.Conv2d` we wszystkich 7 przypadkach. Zaokrąglenie w dół widać dla `k=5, s=3, p=1`: licznik 29, 29//3 = 9, wynik 10.
 
-**Parametry splotu.** `stride` skraca mapę (÷s w każdej osi: 512×384 → 256×192 → 128×96). `padding` decyduje o brzegu (p=0: −2 px, p=3: +4 px). `dilation=2` przy `k=3` daje okno 5×5 przy tych samych 9 wagach; krawędzie w mapie są szersze, a rozmiar zachowuje `p=2`.
+**Parametry splotu.** `stride` skraca mapę (÷s w każdej osi: 512×384 -> 256×192 → 128×96). `padding` decyduje o brzegu (p=0: −2 px, p=3: +4 px). `dilation=2` przy `k=3` daje okno 5×5 przy tych samych 9 wagach; krawędzie w mapie są szersze, a rozmiar zachowuje `p=2`.
 
 **Mapy cech.** Filtry `conv1` dzielą się na kierunkowe detektory krawędzi (poziome 26/57/10, pionowe 14/25, ukośny 19) i filtry „plamowe" o wagach jednego znaku (32, 61), które działają jak wygładzenie. Kierunkowe filtry mają ten sam charakter co ręczne Sobel Y i Sobel X z pkt 3.1. Mapy 3, 7, 13 pokazują, że część filtrów reaguje na ciemne obszary. W głębszych warstwach mapy tracą związek z obrazem: `layer1.0.conv1` (56×56) daje zgrubne, blokowe odpowiedzi na części auta (koła, zderzak, dach), a `layer3.0.conv1` (14×14, 128 kanałów wejścia) nie przypomina już zdjęcia i ma pojedyncze jasne komórki. Pojedynczych filtrów 3×3 z głębszej warstwy (rys. 5b) nie da się zinterpretować wizualnie, bo każdy sumuje wkłady 64 kanałów (576 wag).
 
@@ -184,7 +188,7 @@ Wzory: `Conv2d` = C_out·C_in·k² (+ C_out biasów); gęsta = (C_in·H·W)·(C_
 ## 5. Wnioski
 
 1. Wzór `out = (in + 2p − d(k−1) − 1)//s + 1` dał poprawny wymiar we wszystkich 7 sprawdzonych konfiguracjach; przy `s=1` rozmiar zachowuje `2p = d(k−1)`.
-2. `stride` zmniejsza liczbę wartości mapy ≈ s² razy (196 608 → 49 152 → 12 288), `padding` kontroluje brzeg (±2 px na oś przy p=0/p=3), `dilation` zwiększa zasięg okna (k_eff = 5 przy k=3, d=2) bez dodatkowych wag.
+2. `stride` zmniejsza liczbę wartości mapy ≈ s² razy (196 608 -> 49 152 -> 12 288), `padding` kontroluje brzeg (±2 px na oś przy p=0/p=3), `dilation` zwiększa zasięg okna (k_eff = 5 przy k=3, d=2) bez dodatkowych wag.
 3. Filtry `conv1` ResNet-18 odpowiadają ręcznym jądrom: kierunkowe detektory krawędzi (poziome, pionowe, ukośne) i filtry wygładzające; głębsze warstwy dają mniejsze (56×56, 14×14) mapy, których nie da się odnieść do pojedynczych krawędzi.
 4. Rozmycie Box 5×5 usuwa więcej detalu niż Box 3×3 (37,5% vs 63,1% gradientu oryginału); Gaussian 5×5 przy tym samym oknie zachowuje 55,7%, bo większość wagi leży w środku okna.
 5. Warstwa splotowa ma o 5–10 rzędów wielkości mniej parametrów niż warstwa gęsta o tym samym wejściu i wyjściu (9 408 vs ~1,2·10¹¹ dla `conv1` ResNet-18), dzięki lokalności i współdzieleniu wag.
