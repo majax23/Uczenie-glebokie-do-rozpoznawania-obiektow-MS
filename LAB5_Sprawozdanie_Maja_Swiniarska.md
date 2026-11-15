@@ -40,8 +40,8 @@ Sobel X/Y pokazane ze znakiem (paleta RdBu, wspólna skala ±3,89), pozostałe n
 | Sobel X | `[[-1,0,1],[-2,0,2],[-1,0,1]]` | prawa kolumna − lewa; wykrywa krawędzie **pionowe** (okna, nadkola, słupki szyby) | zakres [−3,78; 3,46], śr. \|gx\| = 0,212 |
 | Sobel Y | transpozycja Sobela X | górny − dolny wiersz; wykrywa krawędzie **poziome** (dach, zderzak, fugi bruku) | zakres [−3,89; 3,82], śr. \|gy\| = 0,344 |
 | Magnituda | √(gx²+gy²) | siła zmiany jasności niezależnie od kierunku | maks. 3,92, śr. 0,468 |
-| Sharpen | `[[0,-1,0],[-1,5,-1],[0,-1,0]]`, suma 1 | środek +5, sąsiedzi −1; zwiększa kontrast przy krawędziach | przed `clamp` zakres [−1,67; 2,59]; 5,9% pikseli <0 i 7,5% >1; odch. std. 0,234 → 0,307 |
-| Box 5×5 | wagi 1/25, suma 1 | lokalna średnia; wygładza i osłabia drobny detal | odch. std. 0,234 → 0,213; śr. magnituda gradientu 0,468 → 0,219 (47%) |
+| Sharpen | `[[0,-1,0],[-1,5,-1],[0,-1,0]]`, suma 1 | środek +5, sąsiedzi −1; zwiększa kontrast przy krawędziach | przed `clamp` zakres [−1,67; 2,59]; 5,9% pikseli <0 i 7,5% >1; odch. std. 0,234 -> 0,307 |
+| Box 5×5 | wagi 1/25, suma 1 | lokalna średnia; wygładza i osłabia drobny detal | odch. std. 0,234 -> 0,213; śr. magnituda gradientu 0,468 -> 0,219 (47%) |
 
 Na tym zdjęciu poziome krawędzie są silniejsze niż pionowe (śr. \|gy\| / \|gx\| = 1,63).
 
@@ -81,7 +81,7 @@ Dla każdego ustawienia rozmiar z `F.conv2d` = rozmiar ze wzoru (wartości w tyt
 
 ### 3.4 Mapy cech pretrenowanej sieci 
 
-Warstwa: `conv1` ResNet-18 (64 filtry 7×7×3 = 147 wag każdy, k=7, s=2, p=3) → 64 mapy 112×112 po ReLU.
+Warstwa: `conv1` ResNet-18 (64 filtry 7×7×3 = 147 wag każdy, k=7, s=2, p=3) -> 64 mapy 112×112 po ReLU.
 
 <img width="1771" height="889" alt="03a_filtry_conv1" src="https://github.com/user-attachments/assets/ed725f83-a7f6-4bab-9174-dfff816710c3" />
 
@@ -128,7 +128,7 @@ Filtry: Box 3×3 (wagi 1/9, `padding=1`), Box 5×5 (wagi 1/25, `padding=2`), Gau
 | Box 5×5 | 0,292 | 37,5% | 1,28 | 0,244 | 0,22 | 0,48 |
 | Gaussian 5×5 | 0,434 | 55,7% | 1,98 | 0,255 | 0,25 | 0,52 |
 
-Szerokość przejścia jasność 0,5 → 0,15 na krawędzi tablica–opona (wiersz 312, kol. 356–360): oryginał 2 px, Box 3×3 3 px, Gaussian 5×5 3 px, Box 5×5 4 px.
+Szerokość przejścia jasność 0,5 -> 0,15 na krawędzi tablica–opona (wiersz 312, kol. 356–360): oryginał 2 px, Box 3×3 3 px, Gaussian 5×5 3 px, Box 5×5 4 px.
 
 **Rozkład wag jąder:**
 
@@ -163,10 +163,10 @@ Na rombie testowym `diag_a` daje odpowiedź tylko na dwóch bokach biegnących p
 
 **Liczba parametrów `Conv2d` vs warstwa gęsta o tym samym wejściu i wyjściu:**
 
-| Przypadek | Wejście → wyjście | `Conv2d` | Gęsta | Stosunek |
+| Przypadek | Wejście -> wyjście | `Conv2d` | Gęsta | Stosunek |
 |---|---|---|---|---|
 | `conv1` ResNet-18, k=7, bez biasu | 3×224×224 -> 64×112×112 | 9 408 | 120 846 286 848 | 12 845 056× |
-| Zdjęcie, 1→8 filtrów, k=3 | 1×512×384 -> 8×512×384 | 80 | 309 239 218 176 | 3 865 490 227× |
+| Zdjęcie, 1->8 filtrów, k=3 | 1×512×384 -> 8×512×384 | 80 | 309 239 218 176 | 3 865 490 227× |
 | 32×32 RGB, 16 filtrów, k=3 | 3×32×32 -> 16×32×32 | 448 | 50 348 032 | 112 384× |
 
 Wzory: `Conv2d` = C_out·C_in·k² (+ C_out biasów); gęsta = (C_in·H·W)·(C_out·H_out·W_out) (+ biasy). Wartości `Conv2d` zgodne z liczbą parametrów z PyTorch (9 408 / 80 / 448).
@@ -177,18 +177,18 @@ Wzory: `Conv2d` = C_out·C_in·k² (+ C_out biasów); gęsta = (C_in·H·W)·(C_
 
 **Wymiary.** Wzór zgadza się z `nn.Conv2d` we wszystkich 7 przypadkach. Zaokrąglenie w dół widać dla `k=5, s=3, p=1`: licznik 29, 29//3 = 9, wynik 10.
 
-**Parametry splotu.** `stride` skraca mapę (÷s w każdej osi: 512×384 -> 256×192 → 128×96). `padding` decyduje o brzegu (p=0: −2 px, p=3: +4 px). `dilation=2` przy `k=3` daje okno 5×5 przy tych samych 9 wagach; krawędzie w mapie są szersze, a rozmiar zachowuje `p=2`.
+**Parametry splotu.** `stride` skraca mapę (÷s w każdej osi: 512×384 -> 256×192 -> 128×96). `padding` decyduje o brzegu (p=0: −2 px, p=3: +4 px). `dilation=2` przy `k=3` daje okno 5×5 przy tych samych 9 wagach; krawędzie w mapie są szersze, a rozmiar zachowuje `p=2`.
 
 **Mapy cech.** Filtry `conv1` dzielą się na kierunkowe detektory krawędzi (poziome 26/57/10, pionowe 14/25, ukośny 19) i filtry „plamowe" o wagach jednego znaku (32, 61), które działają jak wygładzenie. Kierunkowe filtry mają ten sam charakter co ręczne Sobel Y i Sobel X z pkt 3.1. Mapy 3, 7, 13 pokazują, że część filtrów reaguje na ciemne obszary. W głębszych warstwach mapy tracą związek z obrazem: `layer1.0.conv1` (56×56) daje zgrubne, blokowe odpowiedzi na części auta (koła, zderzak, dach), a `layer3.0.conv1` (14×14, 128 kanałów wejścia) nie przypomina już zdjęcia i ma pojedyncze jasne komórki. Pojedynczych filtrów 3×3 z głębszej warstwy (rys. 5b) nie da się zinterpretować wizualnie, bo każdy sumuje wkłady 64 kanałów (576 wag).
 
-**Box 3×3 vs Box 5×5.** Box 5×5 uśrednia 25 pikseli zamiast 9 (σ wag 1,41 vs 0,82 px), więc usuwa więcej detalu: średnia magnituda gradientu we fragmencie spada do 37,5% oryginału wobec 63,1% dla Box 3×3, a maksymalna do 1,28 wobec 2,18. Konkretnie: po Box 3×3 szczeliny grilla pozostają rozdzielone (rozpiętość jasności szczelina–listwa 0,55), po Box 5×5 zlewają się w rozmytą kratkę o niskim kontraście (0,48); cyfry tablicy są nieczytelne już po Box 3×3 (rozpiętość 0,65 → 0,27), po Box 5×5 ciemne plamy znaków zlewają się dalej (0,22). Krawędź tablica–opona jest rozmyta na 3 px (Box 3×3) vs 4 px (Box 5×5), przy 2 px w oryginale.
+**Box 3×3 vs Box 5×5.** Box 5×5 uśrednia 25 pikseli zamiast 9 (σ wag 1,41 vs 0,82 px), więc usuwa więcej detalu: średnia magnituda gradientu we fragmencie spada do 37,5% oryginału wobec 63,1% dla Box 3×3, a maksymalna do 1,28 wobec 2,18. Konkretnie: po Box 3×3 szczeliny grilla pozostają rozdzielone (rozpiętość jasności szczelina–listwa 0,55), po Box 5×5 zlewają się w rozmytą kratkę o niskim kontraście (0,48); cyfry tablicy są nieczytelne już po Box 3×3 (rozpiętość 0,65 -> 0,27), po Box 5×5 ciemne plamy znaków zlewają się dalej (0,22). Krawędź tablica–opona jest rozmyta na 3 px (Box 3×3) vs 4 px (Box 5×5), przy 2 px w oryginale.
 
 **Box 5×5 vs Gaussian 5×5.** Mimo tego samego okna Gaussian zachowuje więcej detalu: 55,7% vs 37,5% średniej magnitudy gradientu, maks. 1,98 vs 1,28, kontrast grilla 0,52 vs 0,48, krawędź tablica–opona rozmyta na 3 px vs 4 px. Wynika to z rozkładu wag: Box nadaje każdemu z 25 pikseli 0,04 (zewnętrzny pierścień niesie 64% wag, σ = 1,41 px), a Gaussian skupia wagę w środku (0,1406, narożniki 0,004), zewnętrzny pierścień niesie 23,4%, σ = 1,00 px. Efektywny zasięg rozmycia Gaussiana 5×5 (σ = 1,00) jest bliższy Box 3×3 (σ = 0,82) niż Box 5×5, co zgadza się z wynikami (55,7% vs 63,1% vs 37,5%).
 
 ## 5. Wnioski
 
 1. Wzór `out = (in + 2p − d(k−1) − 1)//s + 1` dał poprawny wymiar we wszystkich 7 sprawdzonych konfiguracjach; przy `s=1` rozmiar zachowuje `2p = d(k−1)`.
-2. `stride` zmniejsza liczbę wartości mapy ≈ s² razy (196 608 -> 49 152 -> 12 288), `padding` kontroluje brzeg (±2 px na oś przy p=0/p=3), `dilation` zwiększa zasięg okna (k_eff = 5 przy k=3, d=2) bez dodatkowych wag.
+2. `stride` zmniejsza liczbę wartości mapy ≈ s² razy (196 608 -> 49 152 -> 12 288), `padding` kontroluje brzeg (p=0: −2 px, p=3: +4 px na oś względem p=1), `dilation` zwiększa zasięg okna (k_eff = 5 przy k=3, d=2) bez dodatkowych wag.
 3. Filtry `conv1` ResNet-18 odpowiadają ręcznym jądrom: kierunkowe detektory krawędzi (poziome, pionowe, ukośne) i filtry wygładzające; głębsze warstwy dają mniejsze (56×56, 14×14) mapy, których nie da się odnieść do pojedynczych krawędzi.
 4. Rozmycie Box 5×5 usuwa więcej detalu niż Box 3×3 (37,5% vs 63,1% gradientu oryginału); Gaussian 5×5 przy tym samym oknie zachowuje 55,7%, bo większość wagi leży w środku okna.
 5. Warstwa splotowa ma o 5–10 rzędów wielkości mniej parametrów niż warstwa gęsta o tym samym wejściu i wyjściu (9 408 vs ~1,2·10¹¹ dla `conv1` ResNet-18), dzięki lokalności i współdzieleniu wag.
