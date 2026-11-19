@@ -1,9 +1,12 @@
 # Sprawozdanie laboratoryjne
 
 **Przedmiot:** Uczenie głębokie do rozpoznawania obiektów
-**Zajęcia nr / temat:** 6 — Warstwa łącząca (pooling) i pełna CNN
-**Autor / grupa:** …
-**Data:** …
+
+**Zajęcia nr / temat:** 6. Warstwa łącząca (pooling) i pełna CNN
+
+**Autor / grupa:** Maja Świniarska GL.04
+
+**Data:** 18.11.2026
 
 ## 1. Cel ćwiczenia
 
@@ -17,7 +20,9 @@ Zbadanie, jak sposób redukcji wymiaru przestrzennego wpływa na architekturę (
 
 ## 2. Metoda i implementacja
 
-**Narzędzia:** PyTorch 2.14.1, torchvision 0.29.1, Google Colab (Tesla T4). Kod znajduje się w notatniku `sprawozdanie_lab06.ipynb`.
+[Notatnik z kodem](https://github.com/majax23/Uczenie-glebokie-do-rozpoznawania-obiektow-MS/blob/main/LAB6_Zadanie_Maja_Swiniarska.ipynb)
+
+**Narzędzia:** PyTorch 2.14.1, torchvision 0.29.1, Google Colab (Tesla T4).
 
 **Zbiór:** FashionMNIST, oficjalny podział 60 000 / 10 000, normalizacja (0.2860, 0.3530), bez augmentacji.
 
@@ -35,8 +40,8 @@ def block(cin, cout):
     return nn.Sequential(*layers)
 ```
 
-- Kanały w kolejnych blokach: 32 → 64 → 128.
-- Głowica: `AdaptiveAvgPool2d(1) → Flatten → Linear(C, 10)` (GAP) albo `Flatten → Linear(C·H·W, 10)`.
+- Kanały w kolejnych blokach: 32 -> 64 -> 128.
+- Głowica: `AdaptiveAvgPool2d(1) -> Flatten -> Linear(C, 10)` (GAP) albo `Flatten -> Linear(C·H·W, 10)`.
 - Rozmiar mapy przed głowicą wyznaczam przebiegiem próbnym.
 
 **Konfiguracja treningu** (identyczna dla wszystkich 14 wariantów):
@@ -49,7 +54,7 @@ def block(cin, cout):
 | Batch | 128 |
 | Seed | 0 (te same wagi startowe dla tej samej architektury i ta sama kolejność batchy) |
 
-Accuracy treningową i testową liczę po każdej epoce na całych zbiorach, w trybie `eval`. W tabelach podaję wartości **po ostatniej epoce**. Kolumna „maks.\*” to maksimum krzywej testowej, czyli wybór modelu na zbiorze testowym; podaję ją tylko poglądowo.
+Accuracy treningową i testową liczę po każdej epoce na całych zbiorach, w trybie `eval`. W tabelach podaję wartości po ostatniej epoce. Kolumna „maks.\*” to maksimum krzywej testowej, czyli wybór modelu na zbiorze testowym; podaję ją tylko poglądowo.
 
 ## 3. Wyniki
 
@@ -65,7 +70,8 @@ Różnice względem max poolingu:
 - **avg:** −3.33 p.p. przy tej samej liczbie parametrów.
 - **stride:** +6.22 p.p. przy +46 368 parametrach (×3.36). Dodatkowe parametry to dwa sploty 3×3 (9 248 + 36 928) i dwie warstwy BN (64 + 128).
 
-![Krzywe accuracy — zakres obowiązkowy](wyniki_lab06/krzywe_obowiazkowe.png)
+<img width="884" height="667" alt="krzywe_obowiazkowe" src="https://github.com/user-attachments/assets/94b0a039-7e3a-40b7-9570-ad78da91b71b" />
+
 
 ### 3.2 Okno poolingu 2×2 vs 3×3 (krok 2, dla 3×3 padding 1)
 
@@ -76,7 +82,8 @@ Różnice względem max poolingu:
 | avg 2×2 | 19 658 | [64, 7, 7] | 80.59 | 80.27 | 0.33 | 82.24 (8) |
 | avg 3×3 | 19 658 | [64, 7, 7] | 81.92 | 81.69 | 0.23 | 81.69 (10) |
 
-![Okno poolingu](wyniki_lab06/krzywe_A_okno.png)
+<img width="1784" height="667" alt="krzywe_A_okno" src="https://github.com/user-attachments/assets/f4a91b43-9a0e-4140-ae78-48b13fc904f1" />
+
 
 ### 3.3 Głowica: GAP + Linear vs Flatten + Linear
 
@@ -91,7 +98,8 @@ Różnice względem max poolingu:
 
 Mapa przed głowicą to we wszystkich wariantach [64, 7, 7]: GAP podaje do warstwy `Linear` 64 cechy, a Flatten 3 136.
 
-![Głowica GAP vs Flatten](wyniki_lab06/krzywe_B_glowica.png)
+<img width="2684" height="667" alt="krzywe_B_glowica" src="https://github.com/user-attachments/assets/1c9b0f22-8653-4db9-9497-a87c8a017abf" />
+
 
 ### 3.4 Liczba bloków splot–redukcja
 
@@ -109,7 +117,8 @@ Mapa przed głowicą to we wszystkich wariantach [64, 7, 7]: GAP podaje do warst
 
 Przy trzech blokach wymiar 7 jest nieparzysty. Pooling zaokrągla w dół (⌊7/2⌋ = 3), a splot z krokiem 2 i paddingiem 1 w górę (⌊(7 + 2 − 3)/2⌋ + 1 = 4).
 
-![Liczba bloków](wyniki_lab06/krzywe_C_bloki.png)
+<img width="2684" height="667" alt="krzywe_C_bloki" src="https://github.com/user-attachments/assets/86c0c002-2a6a-4927-89c5-0eb5dd0756b9" />
+
 
 ## 4. Analiza i interpretacja
 
@@ -133,7 +142,7 @@ Przy trzech blokach wymiar 7 jest nieparzysty. Pooling zaokrągla w dół (⌊7/
 
 **Liczba bloków.**
 - 1 blok: mapa [32, 14, 14], test acc 63–79%. Jedna warstwa splotowa i GAP to za mało, żeby rozróżnić klasy; max i avg dają praktycznie ten sam wynik (63.89% vs 63.39%).
-- Każdy kolejny blok wyraźnie podnosi accuracy (max: 63.89 → 83.60 → 89.34%), a przy trzech blokach różnice między max i avg prawie znikają (89.34% vs 89.93%).
+- Każdy kolejny blok wyraźnie podnosi accuracy (max: 63.89 -> 83.60 -> 89.34%), a przy trzech blokach różnice między max i avg prawie znikają (89.34% vs 89.93%).
 - Wraz z blokami rośnie też liczba kanałów (32 → 64 → 128). Zmienia się więc jednocześnie głębokość i szerokość, a efektu nie można przypisać samej głębokości.
 - Najlepszy wynik ma stride z 3 blokami (92.31%), ale kosztem 288 618 parametrów i największego przeuczenia (train 98.38%, przerwa 6.07 p.p.).
 
