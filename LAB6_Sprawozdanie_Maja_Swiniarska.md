@@ -167,7 +167,7 @@ avg + Flatten osiąga prawie ten sam wynik co stride z 3 blokami (−0.25 p.p.) 
 
 1. Przy jednakowym budżecie treningowym splot 3×3 z krokiem 2 dał najwyższą accuracy (89.82%), wyraźnie wyższą niż max (83.60%) i avg pooling (80.27%). Kosztem są 46 368 dodatkowych parametrów (×3.36) i dodatkowa głębokość, z których bierze się większa część zysku.
 2. Max pooling jest lepszy od average poolingu w sieci z GAP (+3.33 p.p.) przy zerowym koszcie parametrów. Avg pooling dobrze wypada dopiero bez GAP (avg + Flatten: 92.06%).
-3. Okno 3×3 zamiast 2×2 nie zmienia rozmiaru mapy dla parzystych wymiarów (28 → 14 → 7). Różnica w accuracy (≤ 1.4 p.p.) mieści się w szumie między epokami.
+3. Okno 3×3 zamiast 2×2 nie zmienia rozmiaru mapy dla parzystych wymiarów (28 -> 14 -> 7). Różnica w accuracy (≤ 1.4 p.p.) mieści się w szumie między epokami.
 4. GAP zmniejsza głowicę 48× (650 vs 31 370 parametrów) i ogranicza przeuczenie. W małej, dwublokowej sieci kosztuje to jednak 1.8–11.8 p.p. accuracy, bo usuwa informację o położeniu cech.
 5. Głębsza część splotowa (3 bloki) niweluje różnice między max i avg, a z GAP daje 89.3–92.3%. Przy stride przeuczenie jest jednak największe (przerwa 6.07 p.p.).
 6. Kierunki poprawy:
